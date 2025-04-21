@@ -46,6 +46,13 @@
             <button type="submit">Add Expense</button>
         </form>
 
+        <h2>Import Expenses</h2>
+        <form action="/import_expenses" method="post">
+            <label for="expenses_data">Data (category,description,amount):</label><br>
+            <textarea id="expenses_data" name="expenses_data" rows="4" cols="50" required>a</textarea><br><br>
+            <button type="submit">Import Expenses</button>
+        </form>
+
         <h2>Incomes</h2>
         <table>
             <thead>

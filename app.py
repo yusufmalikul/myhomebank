@@ -73,6 +73,24 @@ def delete_expense(expense_id):
     db.session.commit()
     return redirect(url_for('index'))
 
+@app.route('/import_expenses', methods=['POST'])
+def import_expenses():
+    expenses_data = request.form['expenses_data']
+    expenses_list = expenses_data.splitlines()
+    for expense_string in expenses_list:
+        try:
+            category, description, amount = expense_string.split(',')
+            date = datetime.date.today()  # Use today's date for imported expenses
+            amount = float(amount)
+            new_expense = Expense(date=date, category=category, description=description, amount=amount)
+            db.session.add(new_expense)
+        except ValueError:
+            # Handle invalid data (e.g., missing fields, invalid amount)
+            print(f"Skipping invalid expense data: {expense_string}")
+            continue
+    db.session.commit()
+    return redirect(url_for('index'))
+
 @app.route('/report')
 def report():
     now = datetime.datetime.now()
