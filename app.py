@@ -66,15 +66,28 @@ def add_expense():
 
     return redirect(url_for('index'))
 
+@app.route('/delete/<int:expense_id>')
+def delete_expense(expense_id):
+    expense = Expense.query.get_or_404(expense_id)
+    db.session.delete(expense)
+    db.session.commit()
+    return redirect(url_for('index'))
+
 @app.route('/report')
 def report():
     now = datetime.datetime.now()
     month = now.month
+    month_name = now.strftime("%B")
     year = now.year
 
     expenses = Expense.query.filter(db.extract('month', Expense.date) == month, db.extract('year', Expense.date) == year).all()
     total_expenses = int(sum(expense.amount for expense in expenses))
-    incomes = Income.query.filter(db.extract('month', Income.date) == month, db.extract('year', Income.date) == year).all()
+    
+    import calendar
+    num_days = calendar.monthrange(year, month)[1]
+    daily_average_expense = int(total_expenses / num_days) if total_expenses else 0
+
+    incomes = Income.query.filter(db.extract('month', Income.date) == month, db.extract('year', Expense.date) == year).all()
     total_incomes = int(sum(income.amount for income in incomes))
 
     category_totals = {}
@@ -85,10 +98,11 @@ def report():
             category_totals[expense.category] = expense.amount
 
     category_totals = {category: int(total) for category, total in category_totals.items()}
-    category_totals = {category: int(total) for category, total in category_totals.items()}
+    
+    category_totals = dict(sorted(category_totals.items(), key=lambda item: item[1], reverse=True))
     expenses = [{**expense.__dict__, 'amount': int(expense.amount)} for expense in expenses]
     incomes = [{**income.__dict__, 'amount': int(income.amount)} for income in incomes]
-    return render_template('report.html', expenses=expenses, incomes=incomes, total_expenses=total_expenses, total_incomes=total_incomes, category_totals=category_totals, month=month, year=year)
+    return render_template('report.html', expenses=expenses, incomes=incomes, total_expenses=total_expenses, total_incomes=total_incomes, category_totals=category_totals, month=month, year=year, month_name=month_name, daily_average_expense=daily_average_expense)
 
 if __name__ == '__main__':
     with app.app_context():

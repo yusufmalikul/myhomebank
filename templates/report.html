@@ -10,11 +10,26 @@
 
 <body>
     <div class="container">
-        <h1>MyHomeBank | Monthly Report</h1>
+        <h1>MyHomeBank | Monthly Report - {{ month_name }} {{ year }}</h1>
 
-        <h2>Total Income: {{ total_incomes | format_money }}</h2>
-        <h2>Total Expenses: {{ total_expenses | format_money }}</h2>
-        <h2>Net Income: {{ (total_incomes - total_expenses) | format_money }}</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Total Income</th>
+                    <th>Total Expenses</th>
+                    <th>Net Income</th>
+                    <th>Daily Average Expense</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ total_incomes | format_money }}</td>
+                    <td>{{ total_expenses | format_money }}</td>
+                    <td>{{ (total_incomes - total_expenses) | format_money }}</td>
+                    <td>{{ daily_average_expense | format_money }}</td>
+                </tr>
+            </tbody>
+        </table>
         <canvas id="categoryChart" width="100" height="50"></canvas>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
@@ -78,11 +93,22 @@
         </script>
 
         <h2>Category Totals:</h2>
-        <ul>
-            {% for category, total in category_totals.items() %}
-            <li>{{ category }}: {{ total | format_money }}</li>
-            {% endfor %}
-        </ul>
+        <table>
+            <thead>
+                <tr>
+                    <th>Category</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for category, total in category_totals.items() %}
+                <tr>
+                    <td>{{ category }}</td>
+                    <td>{{ total | format_money }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
 
         <h2>Incomes:</h2>
         <table>
