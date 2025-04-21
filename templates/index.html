@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyHomeBank</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <h1>MyHomeBank</h1>
+
+        <h2>Add Income</h2>
+        <form action="/add_income" method="post">
+            <label for="income_date">Date:</label>
+            <input type="date" id="income_date" name="income_date" value="{{ today_date }}" required><br><br>
+
+            <label for="income_category">Category:</label>
+            <input type="text" id="income_category" name="income_category" required><br><br>
+
+            <label for="income_description">Description:</label>
+            <input type="text" id="income_description" name="income_description" required><br><br>
+
+            <label for="income_amount">Amount:</label>
+            <input type="number" id="income_amount" name="income_amount" step="0.01" required><br><br>
+
+            <button type="submit">Add Income</button>
+        </form>
+
+        <h2>Add Expense</h2>
+        <form action="/add" method="post">
+            <label for="date">Date:</label>
+            <input type="date" id="date" name="date" value="{{ today_date }}" required><br><br>
+
+            <label for="category">Category:</label>
+            <input type="text" id="category" name="category" required><br><br>
+
+            <label for="description">Description:</label>
+            <input type="text" id="description" name="description" required><br><br>
+
+            <label for="amount">Amount:</label>
+            <input type="number" id="amount" name="amount" step="0.01" required><br><br>
+
+            <button type="submit">Add Expense</button>
+        </form>
+
+        <h2>Incomes</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Amount (IDR)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for income in incomes %}
+                <tr>
+                    <td>{{ income.date }}</td>
+                    <td>{{ income.category }}</td>
+                    <td>{{ income.description }}</td>
+                    <td>{{ income.amount | format_money }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>Expenses</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Amount (IDR)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense in expenses %}
+                <tr>
+                    <td>{{ expense.date }}</td>
+                    <td>{{ expense.category }}</td>
+                    <td>{{ expense.description }}</td>
+                    <td>{{ expense.amount | format_money }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button onclick="location.href='/report'" type="button">View Report</button>
+    </div>
+</body>
+
+</html>

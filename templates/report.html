@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyHomeBank | Monthly Report</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body>
+    <div class="container">
+        <h1>MyHomeBank | Monthly Report</h1>
+
+        <h2>Total Income: {{ total_incomes | format_money }}</h2>
+        <h2>Total Expenses: {{ total_expenses | format_money }}</h2>
+        <h2>Net Income: {{ (total_incomes - total_expenses) | format_money }}</h2>
+        <canvas id="categoryChart" width="100" height="50"></canvas>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            const categoryData = JSON.parse('{{ category_totals | tojson | safe }}');
+            const labels = Object.keys(categoryData);
+            const data = Object.values(categoryData);
+
+            const ctx = document.getElementById('categoryChart').getContext('2d');
+            const myChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Category Expenses',
+                        data: data,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        const percentage = (context.parsed / context.dataset.data.reduce((a, b) => a + b, 0) * 100).toFixed(2) + '%';
+                                        label += percentage;
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        </script>
+
+        <h2>Category Totals:</h2>
+        <ul>
+            {% for category, total in category_totals.items() %}
+            <li>{{ category }}: {{ total | format_money }}</li>
+            {% endfor %}
+        </ul>
+
+        <h2>Incomes:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Amount (IDR)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for income in incomes %}
+                <tr>
+                    <td>{{ income.date }}</td>
+                    <td>{{ income.category }}</td>
+                    <td>{{ income.description }}</td>
+                    <td>{{ income.amount | format_money }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <h2>Expenses:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Amount (IDR)</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for expense in expenses %}
+                <tr>
+                    <td>{{ expense.date }}</td>
+                    <td>{{ expense.category }}</td>
+                    <td>{{ expense.description }}</td>
+                    <td>{{ expense.amount | format_money }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        
+                <button onclick="location.href='/'" type="button">Back to Home</button>
+            </div>
+        </body>
+</html>
