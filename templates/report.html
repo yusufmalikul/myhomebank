@@ -112,6 +112,7 @@
                 <tr>
                     <th>Need/Want</th>
                     <th>Total</th>
+                    <th>Percentage of Net Income</th>
                 </tr>
             </thead>
             <tbody>
@@ -119,6 +120,13 @@
                 <tr>
                     <td>{{ need_want }}</td>
                     <td>{{ total | format_money }}</td>
+                    <td>
+                        {% if total_incomes > 0 %}
+                            {{ ((total / total_incomes) * 100) | int }}%
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
