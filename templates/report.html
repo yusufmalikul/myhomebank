@@ -18,6 +18,7 @@
                     <th>Total Income</th>
                     <th>Total Expenses</th>
                     <th>Net Income</th>
+                    <th>Net Income Percentage</th>
                     <th>Daily Average Expense</th>
                 </tr>
             </thead>
@@ -26,21 +27,14 @@
                     <td>{{ total_incomes | format_money }}</td>
                     <td>{{ total_expenses | format_money }}</td>
                     <td>{{ (total_incomes - total_expenses) | format_money }}</td>
+                    <td>
+                        {% if total_incomes > 0 %}
+                            {{ ((total_incomes - total_expenses) / total_incomes * 100) | int }}%
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
                     <td>{{ daily_average_expense | format_money }}</td>
-                </tr>
-            </tbody>
-        </table>
-        <table>
-            <thead>
-                <tr>
-                    <th>Need</th>
-                    <th>Want</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>{{ need_want_totals.get('Need', 0) | format_money }}</td>
-                    <td>{{ need_want_totals.get('Want', 0) | format_money }}</td>
                 </tr>
             </tbody>
         </table>
