@@ -30,6 +30,20 @@
                 </tr>
             </tbody>
         </table>
+        <table>
+            <thead>
+                <tr>
+                    <th>Need</th>
+                    <th>Want</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>{{ need_want_totals.get('Need', 0) | format_money }}</td>
+                    <td>{{ need_want_totals.get('Want', 0) | format_money }}</td>
+                </tr>
+            </tbody>
+        </table>
         <canvas id="categoryChart" width="100" height="50"></canvas>
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
@@ -43,12 +57,12 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Category Expenses',
+                        label: 'Expenses',
                         data: data,
                         backgroundColor: [
-                            'rgba(255, 99, 132, 0.2)',
-                            'rgba(54, 162, 235, 0.2)',
-                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(255, 99, 132, 0.2)', // Red
+                            'rgba(54, 162, 235, 0.2)', // Blue
+                            'rgba(255, 206, 86, 0.2)', // Yellow
                             'rgba(75, 192, 192, 0.2)',
                             'rgba(153, 102, 255, 0.2)',
                             'rgba(255, 159, 64, 0.2)'
@@ -92,11 +106,30 @@
             });
         </script>
 
+        <h2>Need/Want Totals:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Need/Want</th>
+                    <th>Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for need_want, total in need_want_totals.items() %}
+                <tr>
+                    <td>{{ need_want }}</td>
+                    <td>{{ total | format_money }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
         <h2>Category Totals:</h2>
         <table>
             <thead>
                 <tr>
                     <th>Category</th>
+                    <th>Need/Want</th>
                     <th>Total</th>
                 </tr>
             </thead>
@@ -104,6 +137,7 @@
                 {% for category, total in category_totals.items() %}
                 <tr>
                     <td>{{ category }}</td>
+                    <td>{{ category_need_want[category] }}</td>
                     <td>{{ total | format_money }}</td>
                 </tr>
                 {% endfor %}

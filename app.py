@@ -27,6 +27,7 @@ class Expense(db.Model):
     category = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(200), nullable=False)
     amount = db.Column(db.Float, nullable=False)
+    need_want = db.Column(db.String(50), nullable=True)
 
     def __repr__(self):
         return f"Expense(date='{self.date}', category='{self.category}', description='{self.description}', amount={self.amount})"
@@ -60,7 +61,8 @@ def add_expense():
     description = request.form['description']
     amount = float(request.form['amount'])
 
-    new_expense = Expense(date=date, category=category, description=description, amount=amount)
+    need_want = request.form['need_want']
+    new_expense = Expense(date=date, category=category, description=description, amount=amount, need_want=need_want)
     db.session.add(new_expense)
     db.session.commit()
 
@@ -108,19 +110,32 @@ def report():
     incomes = Income.query.filter(db.extract('month', Income.date) == month, db.extract('year', Expense.date) == year).all()
     total_incomes = int(sum(income.amount for income in incomes))
 
+    need_want_totals = {}
     category_totals = {}
     for expense in expenses:
+        if expense.need_want in need_want_totals:
+            need_want_totals[expense.need_want] += expense.amount
+        else:
+            need_want_totals[expense.need_want] = expense.amount
         if expense.category in category_totals:
             category_totals[expense.category] += expense.amount
         else:
             category_totals[expense.category] = expense.amount
 
     category_totals = {category: int(total) for category, total in category_totals.items()}
-    
+    need_want_totals = {need_want: int(total) for need_want, total in need_want_totals.items()}
+
     category_totals = dict(sorted(category_totals.items(), key=lambda item: item[1], reverse=True))
+    category_need_want = {}
+    for expense in expenses:
+        if expense.category in category_need_want:
+            pass
+        else:
+            category_need_want[expense.category] = expense.need_want
     expenses = [{**expense.__dict__, 'amount': int(expense.amount)} for expense in expenses]
     incomes = [{**income.__dict__, 'amount': int(income.amount)} for income in incomes]
-    return render_template('report.html', expenses=expenses, incomes=incomes, total_expenses=total_expenses, total_incomes=total_incomes, category_totals=category_totals, month=month, year=year, month_name=month_name, daily_average_expense=daily_average_expense)
+    return render_template('report.html', expenses=expenses, incomes=incomes, total_expenses=total_expenses, total_incomes=total_incomes, category_totals=category_totals, need_want_totals=need_want_totals, month=month, year=year, month_name=month_name, daily_average_expense=daily_average_expense, category_need_want=category_need_want)
+
 
 if __name__ == '__main__':
     with app.app_context():

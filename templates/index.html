@@ -43,6 +43,11 @@
             <label for="amount">Amount:</label>
             <input type="number" id="amount" name="amount" step="0.01" required><br><br>
 
+            <label for="need_want">Need/Want:</label>
+            <select id="need_want" name="need_want" required>
+                <option value="Need">Need</option>
+                <option value="Want">Want</option>
+            </select><br><br>
             <button type="submit">Add Expense</button>
         </form>
 
@@ -52,7 +57,7 @@
             <textarea id="expenses_data" name="expenses_data" rows="4" cols="50" required>a</textarea><br><br>
             <button type="submit">Import Expenses</button>
         </form>
-
+        <hr>
         <h2>Incomes</h2>
         <table>
             <thead>
@@ -83,6 +88,7 @@
                     <th>Category</th>
                     <th>Description</th>
                     <th>Amount (IDR)</th>
+                    <th>Need/Want</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -93,6 +99,7 @@
                     <td>{{ expense.category }}</td>
                     <td>{{ expense.description }}</td>
                     <td>{{ expense.amount | format_money }}</td>
+                    <td>{{ expense.need_want }}</td>
                     <td><a href="/delete/{{ expense.id }}">Delete</a></td>
                 </tr>
                 {% endfor %}
