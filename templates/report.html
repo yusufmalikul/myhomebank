@@ -29,9 +29,9 @@
                     <td>{{ (total_incomes - total_expenses) | format_money }}</td>
                     <td>
                         {% if total_incomes > 0 %}
-                            {{ ((total_incomes - total_expenses) / total_incomes * 100) | int }}%
+                        {{ ((total_incomes - total_expenses) / total_incomes * 100) | int }}%
                         {% else %}
-                            N/A
+                        N/A
                         {% endif %}
                     </td>
                     <td>{{ daily_average_expense | format_money }}</td>
@@ -81,7 +81,7 @@
                     plugins: {
                         tooltip: {
                             callbacks: {
-                                label: function(context) {
+                                label: function (context) {
                                     let label = context.label || '';
 
                                     if (label) {
@@ -116,9 +116,9 @@
                     <td>{{ total | format_money }}</td>
                     <td>
                         {% if total_incomes > 0 %}
-                            {{ ((total / total_incomes) * 100) | int }}%
+                        {{ ((total / total_incomes) * 100) | int }}%
                         {% else %}
-                            N/A
+                        N/A
                         {% endif %}
                     </td>
                 </tr>
@@ -131,7 +131,6 @@
             <thead>
                 <tr>
                     <th>Category</th>
-                    <th>Need/Want</th>
                     <th>Total</th>
                 </tr>
             </thead>
@@ -139,7 +138,6 @@
                 {% for category, total in category_totals.items() %}
                 <tr>
                     <td>{{ category }}</td>
-                    <td>{{ category_need_want[category] }}</td>
                     <td>{{ total | format_money }}</td>
                 </tr>
                 {% endfor %}
@@ -190,8 +188,9 @@
             </tbody>
         </table>
 
-        
-                <button onclick="location.href='/'" type="button">Back to Home</button>
-            </div>
-        </body>
+
+        <button onclick="location.href='/'" type="button">Back to Home</button>
+    </div>
+</body>
+
 </html>
