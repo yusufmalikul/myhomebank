@@ -95,19 +95,24 @@ def import_expenses():
 
 @app.route('/report')
 def report():
-    now = datetime.datetime.now()
-    month = now.month
-    month_name = now.strftime("%B")
-    year = now.year
+    # Get date range from query parameters or use default (last 30 days)
+    end_date = datetime.datetime.now().date()
+    start_date = end_date - datetime.timedelta(days=30)
 
-    expenses = Expense.query.filter(db.extract('month', Expense.date) == month, db.extract('year', Expense.date) == year).all()
+    if request.args.get('start_date'):
+        start_date = datetime.datetime.strptime(request.args.get('start_date'), '%Y-%m-%d').date()
+    if request.args.get('end_date'):
+        end_date = datetime.datetime.strptime(request.args.get('end_date'), '%Y-%m-%d').date()
+
+    # Query expenses and incomes within the date range
+    expenses = Expense.query.filter(Expense.date >= start_date, Expense.date <= end_date).all()
     total_expenses = int(sum(expense.amount for expense in expenses))
-    
-    import calendar
-    num_days = calendar.monthrange(year, month)[1]
-    daily_average_expense = int(total_expenses / num_days) if total_expenses else 0
 
-    incomes = Income.query.filter(db.extract('month', Income.date) == month, db.extract('year', Expense.date) == year).all()
+    # Calculate daily average expense
+    days_diff = (end_date - start_date).days + 1
+    daily_average_expense = int(total_expenses / days_diff) if total_expenses else 0
+
+    incomes = Income.query.filter(Income.date >= start_date, Income.date <= end_date).all()
     total_incomes = int(sum(income.amount for income in incomes))
 
     need_want_totals = {}
@@ -132,9 +137,27 @@ def report():
             pass
         else:
             category_need_want[expense.category] = expense.need_want
+
     expenses = [{**expense.__dict__, 'amount': int(expense.amount)} for expense in expenses]
     incomes = [{**income.__dict__, 'amount': int(income.amount)} for income in incomes]
-    return render_template('report.html', expenses=expenses, incomes=incomes, total_expenses=total_expenses, total_incomes=total_incomes, category_totals=category_totals, need_want_totals=need_want_totals, month=month, year=year, month_name=month_name, daily_average_expense=daily_average_expense, category_need_want=category_need_want)
+
+    # Get month name and year for display
+    month_name = start_date.strftime("%B")
+    year = start_date.year
+
+    return render_template('report.html',
+                         expenses=expenses,
+                         incomes=incomes,
+                         total_expenses=total_expenses,
+                         total_incomes=total_incomes,
+                         category_totals=category_totals,
+                         need_want_totals=need_want_totals,
+                         month_name=month_name,
+                         year=year,
+                         daily_average_expense=daily_average_expense,
+                         category_need_want=category_need_want,
+                         start_date=start_date.strftime('%Y-%m-%d'),
+                         end_date=end_date.strftime('%Y-%m-%d'))
 
 
 if __name__ == '__main__':
